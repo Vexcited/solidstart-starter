@@ -1,0 +1,23 @@
+name: Docker Image CI
+
+on:
+  push:
+    branches: ["main"]
+  pull_request:
+    branches: ["main"]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+      - name: Build the Docker image
+        run: docker build . --file Dockerfile --tag git.server-staging.skill17.fr/${{ github.repository }}
+      - name: docker login
+        env:
+          USER: ${{ secrets.USER }}
+          PASS: ${{ secrets.PASS }}
+        run: docker login -u $USER -p $PASS git.server-staging.skill17.fr
+      - name: push to docker hub
+        run: docker push git.server-staging.skill17.fr/${{ github.repository }}
